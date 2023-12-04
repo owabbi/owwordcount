@@ -1,0 +1,88 @@
+<div class="flex flex-col items-center">
+<!-- Page title -->
+  <h1 class="mb-4 text-3xl font-extrabold text-blue-700  md:text-5xl lg:text-6xl">
+      Word Count
+  </h1>
+  <div class="flex flex-col justify-center">
+  <!-- Form for word count input -->
+    <.form :let={f} for={%{}} action="/">
+      <div class="flex flex-col md:flex-row items-center justify-center md:gap-3 w-full md:w-[600px] mx-auto">
+        <div class="mb-3 w-[80%]">
+        <!-- URL input field -->
+          <.input
+            type="url"
+            field={f[:url]}
+            placeholder="Enter URL"
+            value={@url_preview}
+            required={true}
+          />
+        </div>
+        <!-- Count button -->
+        <button
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full md:w-1/4 mb-1"
+          type="submit"
+        >
+          Count
+        </button>
+      </div>
+    </.form>
+    
+    <%= if @error_url == true do %>
+    <!-- Display error message if URL is invalid -->
+      <div
+        class="flex justify-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 font-bold"
+        role="alert"
+      >
+        <p class="error_url">Please enter a correct URL.</p>
+      </div>
+    <% else %>
+      <%= if @word_count == 0 and @search_flag == true do %>
+      <!-- Display message if no words are found -->
+      <div class="flex justify-center p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 font-bold" role="alert">
+        <p>There is no word found on this page.</p>
+      </div>
+      <% end %>
+      <%= if @search_flag == true and @word_count > 0 do %>
+        <div class="text-center mb-2">
+          <a
+            href={@url_preview}
+            class="font-medium text-blue-600 hover:underline"
+          >
+          <!-- Display URL if search is performed -->
+            <%= @url_preview %>
+          </a>
+        </div>
+        <div class="flex flex-col md:flex-row justify-center items-center md:gap-3 mb-3">
+        <!-- Display word count and most frequent word -->
+          <p class="mb-2 md:mb-0">
+            Number of words : <span class="font-bold"><%= @word_count %></span>
+          </p>
+          <p class="md:ml-2">Most frequent word :<span class="font-bold"> <%= @top_word %></span></p>
+        </div>
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-10 h-max max-h-[600px]">
+        <!-- Display word frequency table -->
+          <table class="w-full text-sm text-center rtl:text-right">
+            <thead class="text-xs text-white uppercase bg-blue-500 sticky top-0">
+              <tr>
+                <th scope="col" class="px-6 py-3">Word</th>
+                <th scope="col" class="px-6 py-3">Number</th>
+                <th scope="col" class="px-6 py-3">Frequency</th>
+              </tr>
+            </thead>
+            <tbody>
+            <!-- Iterate through words and display their frequency -->
+            <%= for {word, frequency} <- @words do %>
+              <tr class="border-b">
+                <td class="px-6 py-4"><%= word %></td>
+                <td class="px-6 py-4"><%= frequency %></td>
+                <td class="px-6 py-4"><%= Float.ceil(frequency / @word_count * 100, 2) %>%</td>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+
+    <% end %>
+  </div>
+</div>
